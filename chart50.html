@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Company Index Data Chart</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f4f4f4;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  #container {
+    display: flex;
+    gap: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  #company-list {
+    width: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  #company-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  #company-list li {
+    padding: 10px;
+    border-bottom: 1px solid #e1e1e1;
+    cursor: pointer;
+  }
+  #company-list li:hover {
+    background-color: #007bff;
+    color: white;
+  }
+  #company-list li.active {
+    background-color: #0056b3;
+    color: white;
+    font-weight: bold;
+  }
+  #chart-container {
+    flex-grow: 1;
+    background: white;
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.1);
+  }
+  #chart-title {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  canvas {
+    max-width: 100%;
+    height: 400px;
+  }
+</style>
+</head>
+<body>
+  <h1>Company Index Data Chart</h1>
+  <div id="container">
+    <div id="company-list">
+      <ul id="companies-ul">
+        <!-- Company items inserted here dynamically -->
+      </ul>
+    </div>
+    <div id="chart-container">
+      <div id="chart-title">Select a company to view data</div>
+      <canvas id="indexChart" aria-label="Company Index Data Chart" role="img"></canvas>
+    </div>
+  </div>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Sample data for companies
+    const companiesData = [
+      {
+        index_name: "Alpha Corp",
+        index_date: "2024-06-01",
+        open_index_value: 1200,
+        high_index_value: 1250,
+        low_index_value: 1190,
+        closing_index_value: 1240,
+        points_change: +20,
+        change_percent: +1.64,
+        volume: 1000000,
+        turnover_rs_cr: 150,
+        pe_ratio: 18.2,
+        pb_ratio: 3.5,
+        div_yield: 1.2
+      },
+      {
+        index_name: "Beta Industries",
+        index_date: "2024-06-01",
+        open_index_value: 800,
+        high_index_value: 810,
+        low_index_value: 790,
+        closing_index_value: 805,
+        points_change: -5,
+        change_percent: -0.62,
+        volume: 700000,
+        turnover_rs_cr: 85,
+        pe_ratio: 22.5,
+        pb_ratio: 2.8,
+        div_yield: 0.8
+      },
+      {
+        index_name: "Gamma Enterprises",
+        index_date: "2024-06-01",
+        open_index_value: 1500,
+        high_index_value: 1520,
+        low_index_value: 1490,
+        closing_index_value: 1505,
+        points_change: +10,
+        change_percent: +0.67,
+        volume: 500000,
+        turnover_rs_cr: 100,
+        pe_ratio: 16.7,
+        pb_ratio: 4.0,
+        div_yield: 1.5
+      }
+    ];
+
+    const companiesUl = document.getElementById('companies-ul');
+    const chartTitle = document.getElementById('chart-title');
+    const ctx = document.getElementById('indexChart').getContext('2d');
+    let indexChart = null;
+
+    // Populate company list
+    companiesData.forEach((company, idx) => {
+      const li = document.createElement('li');
+      li.textContent = company.index_name;
+      li.dataset.index = idx;
+      companiesUl.appendChild(li);
+    });
+
+    // Helper to format numbers with commas
+    function numberWithCommas(x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    // Chart update function
+    function showCompanyChart(company) {
+      chartTitle.textContent = `${company.index_name} - Index Data (${company.index_date})`;
+
+      // Data to plot: open, high, low, close
+      const labels = ['Open', 'High', 'Low', 'Close', 'Points Change', 'Change %'];
+      const values = [
+        company.open_index_value,
+        company.high_index_value,
+        company.low_index_value,
+        company.closing_index_value,
+        company.points_change,
+        company.change_percent
+      ];
+
+      // If chart exists, destroy before creating new
+      if (indexChart) {
+        indexChart.destroy();
+      }
+
+      indexChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Values',
+            data: values,
+            backgroundColor: [
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(153, 102, 255, 0.7)',
+              'rgba(255, 206, 86, 0.7)',
+              'rgba(255, 159, 64, 0.7)'
+            ],
+            borderColor: [
+              'rgba(54, 162, 235, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(255, 99, 132, 1)',
+              'rgba(153, 102, 255, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: false
+            }
+          },
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: context => {
+                  let label = context.dataset.label || '';
+                  if (label) label += ': ';
+                  if (context.label === 'Change %') {
+                    return label + context.parsed.y.toFixed(2) + '%';
+                  } else if (context.label === 'Points Change') {
+                    return label + context.parsed.y.toFixed(2);
+                  } else {
+                    return label + numberWithCommas(context.parsed.y);
+                  }
+                }
+              }
+            },
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+    }
+
+    // Click handler
+    companiesUl.addEventListener('click', (e) => {
+      if (e.target.tagName === 'LI') {
+        // Remove active class from all
+        Array.from(companiesUl.children).forEach(li => li.classList.remove('active'));
+        e.target.classList.add('active');
+
+        const idx = e.target.dataset.index;
+        const selectedCompany = companiesData[idx];
+        showCompanyChart(selectedCompany);
+      }
+    });
+  </script>
+</body>
+</html>

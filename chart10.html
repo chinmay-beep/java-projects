@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Company Data Chart</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+  }
+  #sidebar {
+    width: 200px;
+    background-color: #2f3e46;
+    color: white;
+    overflow-y: auto;
+  }
+  #sidebar h2 {
+    text-align: center;
+    padding: 1rem;
+    margin: 0;
+    background-color: #354f52;
+  }
+  #company-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  #company-list li {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #4a6c6b;
+    transition: background-color 0.2s;
+  }
+  #company-list li:hover,
+  #company-list li.active {
+    background-color: #52796f;
+  }
+  #content {
+    flex-grow: 1;
+    padding: 20px;
+  }
+  #chart-container {
+    width: 100%;
+    max-width: 700px;
+    margin: auto;
+  }
+</style>
+</head>
+<body>
+  <div id="sidebar">
+    <h2>Companies</h2>
+    <ul id="company-list">
+      <!-- Company items inserted by JS -->
+    </ul>
+  </div>
+  <div id="content">
+    <h2 id="chart-title">Select a company to see data</h2>
+    <div id="chart-container">
+      <canvas id="companyChart" width="700" height="400"></canvas>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Sample company list and data
+    const companies = [
+      { id: 'apple', name: 'Apple Inc.' },
+      { id: 'google', name: 'Google LLC' },
+      { id: 'microsoft', name: 'Microsoft Corp.' },
+      { id: 'amazon', name: 'Amazon.com Inc.' },
+      { id: 'facebook', name: 'Facebook, Inc.' },
+    ];
+
+    // Sample relevant data for each company
+    const companyData = {
+      apple: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'Stock Price (USD)',
+          data: [150, 160, 145, 170, 180, 175],
+          borderColor: 'rgba(255, 99, 132, 1)',
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      google: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'Stock Price (USD)',
+          data: [2800, 2850, 2900, 2950, 3000, 3050],
+          borderColor: 'rgba(54, 162, 235, 1)',
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      microsoft: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'Stock Price (USD)',
+          data: [300, 310, 320, 315, 330, 340],
+          borderColor: 'rgba(75, 192, 192, 1)',
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      amazon: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'Stock Price (USD)',
+          data: [3300, 3350, 3250, 3400, 3500, 3550],
+          borderColor: 'rgba(255, 206, 86, 1)',
+          backgroundColor: 'rgba(255, 206, 86, 0.2)',
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      facebook: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'Stock Price (USD)',
+          data: [320, 330, 310, 340, 350, 360],
+          borderColor: 'rgba(153, 102, 255, 1)',
+          backgroundColor: 'rgba(153, 102, 255, 0.2)',
+          fill: true,
+          tension: 0.3
+        }]
+      }
+    };
+
+    const companyListEl = document.getElementById('company-list');
+    const chartTitleEl = document.getElementById('chart-title');
+    const ctx = document.getElementById('companyChart').getContext('2d');
+    let companyChart = null;
+
+    function renderCompanyList() {
+      companies.forEach(company => {
+        const li = document.createElement('li');
+        li.textContent = company.name;
+        li.dataset.id = company.id;
+        li.addEventListener('click', () => {
+          selectCompany(company.id, company.name, li);
+        });
+        companyListEl.appendChild(li);
+      });
+    }
+
+    function selectCompany(id, name, listItem) {
+      // Remove active class from all items
+      Array.from(companyListEl.children).forEach(li => li.classList.remove('active'));
+      // Set active class on clicked item
+      listItem.classList.add('active');
+
+      chartTitleEl.textContent = `${name} Data`;
+
+      // Get data for chart
+      const data = companyData[id];
+      if (!data) {
+        alert('No data available for this company');
+        return;
+      }
+
+      // Destroy existing chart if any
+      if (companyChart) {
+        companyChart.destroy();
+      }
+
+      companyChart = new Chart(ctx, {
+        type: 'line',
+        data: data,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: false
+            }
+          }
+        }
+      });
+    }
+
+    // Initialize
+    renderCompanyList();
+  </script>
+</body>
+</html>
+
