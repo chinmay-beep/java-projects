@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Modern E-Commerce Site</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    background: #f9f9fb;
+    color: #333;
+  }
+
+  header {
+    background: #1e90ff;
+    color: white;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  header h1 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+  }
+
+  header button#cart-button {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    position: relative;
+  }
+
+  header button#cart-button .cart-count {
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    background: #ff4757;
+    border-radius: 50%;
+    color: white;
+    padding: 2px 7px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  main {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(240px,1fr));
+    gap: 2rem;
+  }
+
+  .product-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgb(0 0 0 / 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
+  }
+  .product-card:hover {
+    box-shadow: 0 8px 20px rgb(0 0 0 / 0.15);
+  }
+
+  .product-image {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .product-details {
+    padding: 1rem 1.25rem 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .product-title {
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+    color: #1e1e1e;
+  }
+
+  .product-price {
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #1e90ff;
+    margin-bottom: 1rem;
+    letter-spacing: 0.03em;
+  }
+
+  .add-to-cart-btn {
+    background: #1e90ff;
+    border: none;
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  .add-to-cart-btn:hover {
+    background-color: #1073e0;
+  }
+
+  /* Cart Sidebar */
+  #cart-sidebar {
+    position: fixed;
+    top: 0;
+    right: -420px;
+    width: 400px;
+    height: 100vh;
+    background: white;
+    box-shadow: -4px 0 15px rgb(0 0 0 / 0.2);
+    transition: right 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+  }
+
+  #cart-sidebar.open {
+    right: 0;
+  }
+
+  #cart-sidebar header {
+    background: #1e90ff;
+    color: white;
+    padding: 1.5rem 1.5rem;
+    font-weight: 700;
+    font-size: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  #cart-sidebar header button {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+
+  #cart-items {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1rem 1.5rem;
+  }
+
+  .cart-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 1rem;
+  }
+
+  .cart-item img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 1rem;
+  }
+
+  .cart-item-info {
+    flex-grow: 1;
+  }
+
+  .cart-item-title {
+    font-weight: 600;
+    margin: 0 0 6px;
+    color: #222222;
+  }
+
+  .cart-item-price {
+    font-weight: 700;
+    color: #1e90ff;
+    margin: 0 0 8px;
+  }
+
+  .cart-item-qty {
+    display: flex;
+    align-items: center;
+  }
+
+  .cart-item-qty button {
+    background: #1e90ff;
+    border: none;
+    color: white;
+    font-weight: 700;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    user-select: none;
+    margin: 0 6px;
+    transition: background-color 0.3s ease;
+  }
+  .cart-item-qty button:hover {
+    background-color: #1073e0;
+  }
+  .cart-item-qty span {
+    min-width: 24px;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  #cart-sidebar footer {
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid #ddd;
+  }
+
+  #cart-total {
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: #222;
+    margin-bottom: 1rem;
+  }
+
+  #checkout-btn {
+    background: #ff4757;
+    border: none;
+    color: white;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    font-weight: 700;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  #checkout-btn:hover {
+    background-color: #e0424b;
+  }
+
+  /* Responsive for smaller screens */
+  @media (max-width: 480px) {
+    #cart-sidebar {
+      width: 100vw;
+      right: -100vw;
+    }
+    #cart-sidebar.open {
+      right: 0;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>ShopEase</h1>
+  <button id="cart-button" aria-label="Toggle cart">
+    🛒 Cart <span class="cart-count" id="cart-count">0</span>
+  </button>
+</header>
+
+<main>
+  <section class="products-grid" id="products-grid">
+    <!-- Products injected by JS -->
+  </section>
+</main>
+
+<!-- Cart Sidebar -->
+<aside id="cart-sidebar" aria-label="Shopping cart">
+  <header>
+    Your Cart
+    <button id="close-cart-button" aria-label="Close cart">✕</button>
+  </header>
+  <div id="cart-items">
+    <p>Your cart is empty.</p>
+  </div>
+  <footer>
+    <div id="cart-total">Total: $0.00</div>
+    <button id="checkout-btn" disabled>Checkout</button>
+  </footer>
+</aside>
+
+<script>
+  // Sample products data
+  const products = [
+    {
+      id: 'p1',
+      title: 'Wireless Headphones',
+      price: 69.99,
+      image: 'https://i.pcmag.com/imagery/lineups/047LRRic51vKPYxc49v1tMp-1.fit_lim.size_768x432.v1569470810.jpg',
+    },
+    {
+      id: 'p2',
+      title: 'Smart Watch',
+      price: 199.95,
+      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80',
+    },
+    {
+      id: 'p3',
+      title: 'Vintage Camera',
+      price: 349.99,
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUCG1-dHpneIZMS0_pmAvMz-vzefq2wJrb6A&s',
+    },
+    {
+      id: 'p4',
+      title: 'Classic Leather Wallet',
+      price: 49.99,
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwB4j24LvMe0xYtL1_6YMlwngCWjVYn_1SAA&s',
+    },
+    {
+      id: 'p5',
+      title: 'Bluetooth Speaker',
+      price: 89.90,
+      image: 'https://images-cdn.ubuy.co.in/64f71c61138f4e7cf9789e90-sony-extra-bass-portable-bluetooth.jpg',
+    },
+    {
+      id: 'p6',
+      title: 'Sunglasses',
+      price: 29.50,
+      image: 'https://m.media-amazon.com/images/I/51wwVl2r-WL._AC_UY1100_DpWeblab_.jpg',
+    }
+  ];
+
+  // Cart data stored as a dictionary with product id keys
+  let cart = {};
+
+  // DOM elements
+  const productsGrid = document.getElementById('products-grid');
+  const cartButton = document.getElementById('cart-button');
+  const cartSidebar = document.getElementById('cart-sidebar');
+  const closeCartButton = document.getElementById('close-cart-button');
+  const cartItemsContainer = document.getElementById('cart-items');
+  const cartCountElement = document.getElementById('cart-count');
+  const cartTotalElement = document.getElementById('cart-total');
+  const checkoutButton = document.getElementById('checkout-btn');
+
+  // Render products catalog
+  function renderProducts() {
+    products.forEach((product) => {
+      const productCard = document.createElement('article');
+      productCard.className = 'product-card';
+
+      productCard.innerHTML = `
+        <img class="product-image" src="${product.image}" alt="${product.title}" />
+        <div class="product-details">
+          <h2 class="product-title">${product.title}</h2>
+          <div class="product-price">$${product.price.toFixed(2)}</div>
+          <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+        </div>
+      `;
+
+      productsGrid.appendChild(productCard);
+    });
+  }
+
+  // Update cart count badge
+  function updateCartCount() {
+    const totalQuantity = Object.values(cart).reduce((acc, item) => acc + item.qty, 0);
+    cartCountElement.textContent = totalQuantity;
+  }
+
+  // Update cart total display
+  function updateCartTotal() {
+    const total = Object.values(cart).reduce(
+      (acc, item) => acc + item.qty * item.product.price,
+      0
+    );
+    cartTotalElement.textContent = `Total: $${total.toFixed(2)}`;
+    checkoutButton.disabled = total === 0;
+  }
+
+  // Render cart items in sidebar
+  function renderCartItems() {
+    cartItemsContainer.innerHTML = '';
+
+    const cartItems = Object.values(cart);
+
+    if (cartItems.length === 0) {
+      cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
+      return;
+    }
+
+    cartItems.forEach(({ product, qty }) => {
+      const cartItemEl = document.createElement('div');
+      cartItemEl.className = 'cart-item';
+
+      cartItemEl.innerHTML = `
+        <img src="${product.image}" alt="${product.title}" />
+        <div class="cart-item-info">
+          <h3 class="cart-item-title">${product.title}</h3>
+          <div class="cart-item-price">$${product.price.toFixed(2)}</div>
+          <div class="cart-item-qty">
+            <button class="qty-decrease" aria-label="Decrease quantity" data-id="${product.id}">−</button>
+            <span>${qty}</span>
+            <button class="qty-increase" aria-label="Increase quantity" data-id="${product.id}">+</button>
+          </div>
+        </div>
+      `;
+
+      cartItemsContainer.appendChild(cartItemEl);
+    });
+  }
+
+  // Add product to cart
+  function addToCart(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    if (cart[productId]) {
+      cart[productId].qty += 1;
+    } else {
+      cart[productId] = { product, qty: 1 };
+    }
+    updateCartCount();
+    updateCartTotal();
+    renderCartItems();
+  }
+
+  // Change quantity of cart item
+  function changeQuantity(productId, diff) {
+    if (!cart[productId]) return;
+    cart[productId].qty += diff;
+    if (cart[productId].qty <= 0) {
+      delete cart[productId];
+    }
+    updateCartCount();
+    updateCartTotal();
+    renderCartItems();
+  }
+
+  // Toggle cart sidebar visibility
+  function toggleCart() {
+    cartSidebar.classList.toggle('open');
+  }
+
+  // Checkout simulation
+  function checkout() {
+    if (Object.keys(cart).length === 0) {
+      alert('Your cart is empty.');
+      return;
+    }
+    alert('Thank you for your purchase! Your order has been processed.');
+    cart = {};
+    updateCartCount();
+    updateCartTotal();
+    renderCartItems();
+    toggleCart();
+  }
+
+  // Event listeners
+  productsGrid.addEventListener('click', (e) => {
+    if (e.target.classList.contains('add-to-cart-btn')) {
+      const productId = e.target.getAttribute('data-id');
+      addToCart(productId);
+    }
+  });
+
+  cartButton.addEventListener('click', toggleCart);
+  closeCartButton.addEventListener('click', toggleCart);
+
+  cartItemsContainer.addEventListener('click', (e) => {
+    if (e.target.classList.contains('qty-increase')) {
+      const productId = e.target.getAttribute('data-id');
+      changeQuantity(productId, +1);
+    }
+    if (e.target.classList.contains('qty-decrease')) {
+      const productId = e.target.getAttribute('data-id');
+      changeQuantity(productId, -1);
+    }
+  });
+
+  checkoutButton.addEventListener('click', checkout);
+
+  // Initial render
+  renderProducts();
+  updateCartCount();
+  updateCartTotal();
+  renderCartItems();
+</script>
+</body>
+</html>
+
